@@ -101,7 +101,7 @@ public class restResource {
      */
     @Path("/test")
     @GET
-    @ApiOperation(value = "userinfo", notes = "get user info")
+    @ApiOperation(value = "test", notes = "test")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "OK")        
         ,
