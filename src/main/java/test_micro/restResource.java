@@ -5,6 +5,7 @@
  */
 package test_micro;
 
+import beans.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -21,6 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import javax.inject.Inject;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -84,6 +86,9 @@ public class restResource {
     private Request request;
     private static ConcurrentHashMap<String, Object> cash = new ConcurrentHashMap();
 
+    @Inject
+    user user_1;
+
     /**
      * Конструктор
      */
@@ -91,7 +96,6 @@ public class restResource {
         log.info("\n************* constructor ****************\n");
     }
 
-   
     /**
      * Получаение информации о пользователе
      *
@@ -103,14 +107,13 @@ public class restResource {
     @GET
     @ApiOperation(value = "test", notes = "test")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK")        
+        @ApiResponse(code = 200, message = "OK")
         ,
         @ApiResponse(code = 500, message = "Something wrong in Server")})
     public Response test() throws ParseException {
         log.info(String.format("\n********************* %s  %s *********************", new Date(), "test"));
-        return Response.status(Status.OK).build();
+        return Response.status(Status.OK).entity(user_1).build();
     }
-
 
     /**
      *
