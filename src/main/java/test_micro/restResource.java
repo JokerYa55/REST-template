@@ -5,53 +5,27 @@
  */
 package test_micro;
 
-import beans.user;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
-import java.io.UnsupportedEncodingException;
-import java.net.URL;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import javax.inject.Inject;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Form;
-import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import rest_exception.exDefaultException;
-import rest_exception.exNotAuthorizedException;
-import rest_exception.exNotDataFoundException;
+import javax.ws.rs.container.Suspended;
+import java.util.concurrent.Executor;
 
 /**
  *
@@ -86,9 +60,8 @@ public class restResource {
     private Request request;
     private static ConcurrentHashMap<String, Object> cash = new ConcurrentHashMap();
 
-    @Inject
-    user user_1;
-
+    //@Inject
+    //user user_1;
     /**
      * Конструктор
      */
@@ -112,7 +85,35 @@ public class restResource {
         @ApiResponse(code = 500, message = "Something wrong in Server")})
     public Response test() throws ParseException {
         log.info(String.format("\n********************* %s  %s *********************", new Date(), "test"));
-        return Response.status(Status.OK).entity(user_1).build();
+        //log.info(String.format("user = %s", user_1));
+        long b_time = new Date().getTime();
+        long res = 0;
+        for (int i = 0; i < 100000; i++) {
+            res ++ ;
+        }
+        long e_time = new Date().getTime();
+        return Response.status(Status.OK).entity(String.format("res = %s time = %s", res, ((e_time - b_time) / 1000))).build();
+    }
+
+    @Path("/async")
+    @GET
+    public void asyncGet(@Suspended final AsyncResponse asyncResponse) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String result = veryExpensiveOperation();
+                asyncResponse.resume(result);
+            }
+
+            private String veryExpensiveOperation() {
+                long b_time = new Date().getTime();
+                for (int i = 0; i < 100000; i++) {
+                    System.out.println("i = " + i);
+                }
+                long e_time = new Date().getTime();
+                return "Very Expensive Operation = " + (e_time - b_time) / 1000;
+            }
+        }).start();
     }
 
     /**
