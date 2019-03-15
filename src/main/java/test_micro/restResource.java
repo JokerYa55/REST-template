@@ -15,7 +15,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.container.AsyncResponse;
-import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -25,7 +24,7 @@ import javax.ws.rs.core.Response.Status;
 import org.apache.log4j.Logger;
 import org.json.simple.parser.ParseException;
 import javax.ws.rs.container.Suspended;
-import java.util.concurrent.Executor;
+import java.util.logging.Level;
 
 /**
  *
@@ -36,7 +35,7 @@ import java.util.concurrent.Executor;
 @Api(value = "/rest_test", description = "REST TEST")
 public class restResource {
 
-    private final Logger log = Logger.getLogger(getClass().getName());
+    private static final Logger log = Logger.getLogger("rest");
     private final String REGEXP_ATTR_PATTERN = "^id_app_[a-zA-Z0-9_]{1,}$";
     private final String HEADER_CACHE_CONTROL_NAME = "Cache-Control";
     private final String HEADER_CACHE_CONTROL_VAL = "no-store";
@@ -66,7 +65,7 @@ public class restResource {
      * Конструктор
      */
     public restResource() {
-        log.info("\n************* constructor ****************\n");
+        //log.info("\n************* constructor ****************\n");
     }
 
     /**
@@ -84,20 +83,23 @@ public class restResource {
         ,
         @ApiResponse(code = 500, message = "Something wrong in Server")})
     public Response test() throws ParseException {
-        log.info(String.format("\n********************* %s  %s *********************", new Date(), "test"));
+        //log.info(String.format("\n********************* %s  %s *********************", new Date(), "TEST"));
         //log.info(String.format("user = %s", user_1));
         long b_time = new Date().getTime();
         long res = 0;
-        for (int i = 0; i < 100000; i++) {
-            res ++ ;
+        for (int i = 0; i < 10; i++) {
+            res ++;
         }
         long e_time = new Date().getTime();
-        return Response.status(Status.OK).entity(String.format("res = %s time = %s", res, ((e_time - b_time) / 1000))).build();
+        String res_text = String.format("res = %s time = %s", res, ((e_time - b_time)));
+        //log.info(res_text);
+        return Response.status(Status.OK).entity(res_text).build();
     }
 
     @Path("/async")
     @GET
     public void asyncGet(@Suspended final AsyncResponse asyncResponse) {
+        log.info("ASYNC");
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -107,11 +109,14 @@ public class restResource {
 
             private String veryExpensiveOperation() {
                 long b_time = new Date().getTime();
-                for (int i = 0; i < 100000; i++) {
-                    System.out.println("i = " + i);
+                int j = 0;
+                try {
+                    Thread.sleep(300);
+                } catch (Exception ex) {
+                    java.util.logging.Logger.getLogger(restResource.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 long e_time = new Date().getTime();
-                return "Very Expensive Operation = " + (e_time - b_time) / 1000;
+                return "Very Expensive Operation = " + (e_time - b_time) + "   " + j;
             }
         }).start();
     }

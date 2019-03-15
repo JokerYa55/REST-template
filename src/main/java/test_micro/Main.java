@@ -26,6 +26,9 @@ import org.glassfish.grizzly.http.CompressionConfig;
 import org.glassfish.grizzly.http.server.ErrorPageGenerator;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.Request;
+import org.glassfish.grizzly.nio.transport.TCPNIOTransport;
+import org.glassfish.grizzly.strategies.WorkerThreadIOStrategy;
+import org.glassfish.grizzly.threadpool.ThreadPoolConfig;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.moxy.json.MoxyJsonConfig;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -71,6 +74,28 @@ public class Main {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         final HttpServer server = startServer();
+
+//        final TCPNIOTransport transport = server.getListener("grizzly").getTransport();
+//        int core_pool_size = 15;
+//        int core_max_size = 100;
+//        int queue_limit = -1;
+//        try {
+//            core_max_size = Integer.parseInt((String) properties.get("app_max_pool_size"));
+//            core_pool_size = Integer.parseInt((String) properties.get("app_core_pool_size"));
+//            queue_limit = Integer.parseInt((String) properties.get("app_pool_queue_limit"));
+//        } catch (Exception e) {
+//            log.log(Level.ERROR, e);
+//        }
+//        ThreadPoolConfig config = ThreadPoolConfig.defaultConfig().setPoolName("worker-thread-")
+//                .setCorePoolSize(core_pool_size)
+//                .setMaxPoolSize(core_max_size)
+//                .setQueueLimit(queue_limit);
+//        transport.configureBlocking(false);
+//        transport.setSelectorRunnersCount(10);
+//        transport.setWorkerThreadPoolConfig(config);
+//        transport.setIOStrategy(WorkerThreadIOStrategy.getInstance());
+//        transport.setTcpNoDelay(true);
+
         // включаем компрессию
         if (((String) properties.get("app_response_compress_enables")).equals("true")) {
             log.info("response_compress enabled!");
